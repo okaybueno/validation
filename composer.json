@@ -1,0 +1,23 @@
+{
+    "name": "okaybueno/validation",
+    "description": "Validation as Service for Laravel applications.",
+    "keywords": ["php", "laravel", "validation", "service"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jesús Espejo",
+            "email": "jesus@okaybueno.com",
+            "homepage": "http://www.okaybueno.com",
+            "role": "Tech Strategy Partner"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "illuminate/contracts": "5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "OkayBueno\\Validation\\": ""
+        }
+    }
+}
