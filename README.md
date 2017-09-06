@@ -2,6 +2,12 @@
 
 A package that provides validation as a service for Laravel 5.x.
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/okaybueno/validation.svg?style=flat-square)](https://packagist.org/packages/okaybueno/validation)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![Quality Score](https://img.shields.io/scrutinizer/g/okaybueno/validation.svg?style=flat-square)](https://scrutinizer-ci.com/g/okaybueno/validation)
+[![Total Downloads](https://img.shields.io/packagist/dt/okaybueno/validation.svg?style=flat-square)](https://packagist.org/packages/okaybueno/validation)
+
+
 ## Disclaimer
 
 This package was originally released [here](https://github.com/followloop/validation-service), but since the future 
