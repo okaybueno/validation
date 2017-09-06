@@ -184,7 +184,8 @@ class UsersService implements UsersServicesInterface
 
 ## Changelog
 
--- No official version released yet --
+##### v1.0.0:
+- First public official version released.
 
 ## Credits
 
@@ -195,10 +196,6 @@ class UsersService implements UsersServicesInterface
 
 * Found a bug? That's good (and bad). Let me know using the Issues on Github.
 * Need a feature or have something interesting to contribute with? Great! Open a pull request.
-
-## To-dos
-
-- Automated tests: Although this package has been heavily tested (even on production), there are no automated tests in place.
 
 ## License
 
