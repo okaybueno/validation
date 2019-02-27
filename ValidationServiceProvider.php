@@ -60,7 +60,8 @@ class ValidationServiceProvider extends ServiceProvider
             foreach( $folders as $folder )
             {
                 $folderPath = $validatorsBasePath.'/'.$folder;
-                $currentImplementationNamespace = $baseNamespace.$folder.'\\src';
+                $currentInterfaceNamespace = $baseNamespace.$folder.'\\';
+                $currentImplementationNamespace = $currentInterfaceNamespace.'src';
 
                 // Scan files within the folder.
                 $validatorInterfacesInFolder = File::files( $folderPath );
@@ -71,7 +72,7 @@ class ValidationServiceProvider extends ServiceProvider
                     $interfaceName = pathinfo( $validatorInterface, PATHINFO_FILENAME );
 
                     $commonName = str_replace( 'Interface', '', $interfaceName );
-                    $interfaceFullClassName = $baseNamespace.$interfaceName;
+                    $interfaceFullClassName = $currentInterfaceNamespace.$interfaceName;
 
                     $fullClassName = $currentImplementationNamespace.'\\'.$commonName;
 

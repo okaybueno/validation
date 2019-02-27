@@ -22,7 +22,7 @@ highly opinionated way of solving this issue.
 ## Installation
 
 1. Install this package by adding it to your `composer.json` or by running `composer require okaybueno/validation-service` in your project's folder.
-2. Publish the configuration file by running php artisan vendor:publish --provider="OkayBueno\Validation\ValidationServiceProvider".
+2. Publish the configuration file by running `php artisan vendor:publish --provider="OkayBueno\Validation\ValidationServiceProvider"`.
 3. Configure the `config/validators.php` file according to your needs, specifying the base namespace and directories for your validators.
 4. Ready to go! No service provider or anything else needed :).
 
