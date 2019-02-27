@@ -8,41 +8,42 @@ A package that provides validation as a service for Laravel 5.x.
 [![Total Downloads](https://img.shields.io/packagist/dt/okaybueno/validation.svg?style=flat-square)](https://packagist.org/packages/okaybueno/validation)
 
 
-## Disclaimer
-
-This package was originally released [here](https://github.com/followloop/validation-service), but since the future 
-of that package is not clear, it has been forked and re-worked under this repository.
-
 ## Goal
 
 There is a lot of talk about where to perform the data validation: repositories? controllers? gateways? services? models?
 Each one has its point; good things and bad things... We personally found useful to extract this logic to a service that can 
-be injected into other services on the same -or higher- layer.
+be injected into other services on the same -or higher- layer. 
 
 So the goal of this package is to provide a simple validation service that can be injected into other services, and that 
-although it uses the Laravel Validation class by default, it can be extended to use other validation libraries.
+although it uses the Laravel Validation class by default, it can be extended to use other validation libraries. This is a 
+highly opinionated way of solving this issue.
+
 
 ## Installation
 
 1. Install this package by adding it to your `composer.json` or by running `composer require okaybueno/validation-service` in your project's folder.
-2. Ready to go! No service provider or anything else needed :).
+2. Publish the configuration file by running php artisan vendor:publish --provider="OkayBueno\Validation\ValidationServiceProvider".
+3. Configure the `config/validators.php` file according to your needs, specifying the base namespace and directories for your validators.
+4. Ready to go! No service provider or anything else needed :).
 
 
 ## Usage
 
-You just need to create a Validation class that extends the main validation class (`LaravelValidator`) and implements
-their own methods to validate the data. It sounds weird, huh? Lets see an example...
+You just need to create a Validation interface with the different validation methods, and then create a new ´src´  directory 
+where you will then create the validation class that extends the main validation class (`LaravelValidator`) and implements 
+the previous interface. It sounds weird, huh? Lets see it with an example...
 
 
 ## Examples
 
 I personally like to split my Laravel code from my app code, so inside the app folder I usually create a folder that includes
 ALL the business logic that is lowly coupled to the framework: app/MyWebApp. Inside that folder I like to split my files into 
-different folders, based on the role of these: Models? Repositories? Helpers? Services? And so on...
+different folders, based on the role of these: Models? Repositories? Helpers? Services? Validators? And so on...
 
 Once again -and this is a matter of taste, that's all- I like to split my services into areas of responsibility: Users, Auth,
-Mailing, etc. And then, in that service folders, I like to include the validators. So the folder structure inside my projects
-looks pretty much like this most of the times:
+Mailing, etc. Therefore, I like to split my validators in different folders that then contain the different interfaces,
+along with the `src` folder that contains the implementation. So the folder structure inside my projects looks pretty 
+much like this most of the times:
 
 ```
 +-- app
@@ -52,28 +53,22 @@ looks pretty much like this most of the times:
 |       +-- Repositories
 |       .
 |       .
-|       +-- Services
+|       +-- Validation
 |           +-- Auth
 |           +-- Mailing
 |           +-- Users
-|               +-- UsersServicesInterface.php
-|               +-- UsersServiceProvider.php
-|               .
-|               .
+|               +-- UserValidatorInterface.php
 |               +-- src
-|               +-- Validation
-|                   +-- UserValidatorInterface.php
-|                   +-- src
-|                       +-- LaravelUserValidator.php
+                    +-- UsersValidator.php
 ```
 
-Let's take a look at how I would implement the UserValidatorInterface and the LaravelUserValidator classes:
+Let's take a look at how I would implement the UserValidatorInterface and the UserValidator classes:
 
 ```php
 
 <?php
 
-namespace MyApp\Services\Users\Validation;
+namespace MyApp\Validators\Users;
 
 interface UserValidatorInterface
 {
@@ -90,60 +85,41 @@ interface UserValidatorInterface
 
 <?php
 
-namespace MyApp\Services\Users\Validation\src;
+namespace MyApp\Validators\Users\src;
 
 use OkayBueno\Validation\src\LaravelValidator;
 
-class LaravelUserValidator extends LaravelValidator implements UserValidatorInterface
+class UserValidator extends LaravelValidator implements UserValidatorInterface
 {   
 
     public function existsById()
     {
         return [
             'id'    => 'required|exists:users,id'
-        ]
+        ];
     }
     
     public function existsByEmail()
     {
         return [
             'email'    => 'required|exists:users,email'
-        ]
+        ];
     }
 }
 
 ```
 
-The service provider for this group of services (`UsersServiceProvider`) should be responsible of providing me with the validator for the user, bind
- to the LaravelUserValidator, something like this:
- 
-```php
-
-public function register()
-{
-    // Register other services here...
-    
-    // Clients validation services
-    $this->app->bind( 'MyApp\Services\Users\Validation\UserValidatorInterface', function ( $app )
-    {
-        return $app->make( 'MyApp\Services\Users\Validation\src\LaravelUserValidator' );
-    });
-}
-
-```
-
-
-After this and after adding our service provide to the `config/app.php` file, we can inject the Validation service in any 
-part of our app. I like to use ONLY inside other services. Something like this...
+Vôila! The package does the rest. Now you can inject the Validation service in any part of our app. 
+I like to use ONLY inside other services, something like this...
 
 
 ```php
 
 <?php
 
-namespace MyApp\Services\Users\src;
+namespace MyApp\Services\Frontend\Users\src;
 
-use MyApp\Services\Users\Validation\UserValidator;
+use MyApp\Validators\Users\UsersValidatorInterface;
 
 class UsersService implements UsersServicesInterface 
 {
@@ -151,20 +127,20 @@ class UsersService implements UsersServicesInterface
     protected $usersValidator;
 
     public function __construct(
-        UsersValidator $usersValidatorInterface
+        UsersValidatorInterface $usersValidatorInterface
     )
     {
         $this->usersValidator = $usersValidatorInterface;
     }
    
     
-    public function getUserById( $userId )
+    public function findUserById( $userId )
     {
         $data = [
             'id' => $userId
         ]
         
-        if ( $this->usersValidator->with( $data )->passes( UserValidatorInterface::EXISTS_BY_ID ) )
+        if ( $this->usersValidator->with( $data )->passes( UsersValidatorInterface::EXISTS_BY_ID ) )
         {
             // It passes the validation, so do whatever.. fetch user in $user and return it (for example).
             
@@ -182,7 +158,14 @@ class UsersService implements UsersServicesInterface
 
 ```
 
+And that's all! Remember: The important thing is that the interface lives in the folder specified in the configuration file,
+ and that the implementation for that interface lives under the `src` folder.
+
 ## Changelog
+
+##### v2.0.0:
+- New (breaking) version. Instead of having validators tied to services, now they live in their own folder and are automatically
+bound when installing the package.
 
 ##### v1.0.0:
 - First public official version released.
