@@ -13,7 +13,7 @@ return [
     | application: "MyApp\Validators".
     |
     */
-    'validator_interfaces_namespace' => 'Hi\Validators',
+    'validator_interfaces_namespace' => 'MyApp\Validators',
 
     /*
     |--------------------------------------------------------------------------
@@ -26,5 +26,5 @@ return [
     | a folder located in "app", something like "app/MyApp/Validators".
     |
     */
-    'validators_path' => app_path('Hi/Validators'),
+    'validators_path' => app_path('MyApp/Validators'),
 ];
